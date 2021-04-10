@@ -81,6 +81,20 @@ contract PlantMasterV1 is Ownable {
         slaves.push(address(ngrCtfStaking));
     }
     
+    function enablePool(address staking) public onlyOwner {
+    	(bool _success, ) = staking.call(abi.encodeWithSignature("enablePool()"));
+        require(_success, "PlantMasterV1:: Operation failed");
+        
+        return _success;
+    }
+    
+    function disablePool(address staking) public onlyOwner {
+    	(bool _success, ) = staking.call(abi.encodeWithSignature("disablePool()"));
+        require(_success, "PlantMasterV1:: Operation failed");
+        
+        return _success;
+    }
+    
     function updateNativePool(
         address staking, 
         uint256 _tokenPerBlock, 

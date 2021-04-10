@@ -17,6 +17,7 @@ contract NativeStaking is Context, Ownable {
     uint256 public _decimals;
     uint256 private magnitude;
     address private fee;
+    bool public poolStatus;
 
     constructor (
         address tokenContract, 
@@ -36,6 +37,12 @@ contract NativeStaking is Context, Ownable {
         allocation = (uint256)(_allocation*(uint256)(_decimals));
         magnitude = _magnitude;
         fee = owner();
+        poolStatus = true;
+    }
+    
+    modifier isActivePool() {
+        require(poolStatus == true, "NativeStaking:: staking pool disabled");
+        _;
     }
     
     address[] public stakers;
@@ -47,7 +54,7 @@ contract NativeStaking is Context, Ownable {
     uint256 public totalRewards;
     
 
-    function deposit(uint256 amount) external {
+    function deposit(uint256 amount) external isActivePool {
         require(_msgSender() == tx.origin); // preventing flash-loans
         _stakeToken(_msgSender(), amount);
     } 
@@ -145,5 +152,13 @@ contract NativeStaking is Context, Ownable {
             magnitude = _magnitude;
             allocation = _allocation;
             startsFrom = _startsFrom;
+    }
+    
+    function disablePool() external onlyOwner {
+    	poolStatus = false;
+    }
+    
+    function enablePool() external onlyOwner {
+    	poolStatus = true;
     }
 }
